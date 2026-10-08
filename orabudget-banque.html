@@ -18,14 +18,20 @@ footer{color:var(--gris);font-size:14px;padding-bottom:40px}
 </style><title>ORAMAP · Confidentialité</title></head><body>
 <title>ORABUDGET · Connexion bancaire</title></head><body>
 <header><div class="w"><div class="tag">ORABUDGET · par ORAPACE</div><h1 id="titre">Connexion bancaire</h1></div></header>
-<main class="w">
-<div class="carte"><h2 id="etat">Retour vers ORABUDGET…</h2>
-<p id="texte">Si l'app ne s'ouvre pas toute seule, touche le bouton ci-dessous.</p>
-<p><a id="lien" href="orabudget://banque">Ouvrir ORABUDGET</a></p></div>
-<p style="color:var(--gris);font-size:14px">Cette page ne garde rien et ne contient aucun traceur : elle renvoie seulement la réponse de ta banque à l'app, sur ton téléphone.</p>
+<style>
+.bouton{display:block;text-align:center;background:var(--jaune);color:var(--encre);font-weight:700;font-size:19px;text-decoration:none;padding:18px;border-radius:999px;margin:18px 0 6px}
+.second{display:block;width:100%;text-align:center;background:none;border:1.5px solid var(--bleu);color:var(--bleu);font:600 16px -apple-system,sans-serif;padding:13px;border-radius:999px;margin-top:14px}
+.petit{color:var(--gris);font-size:14px}
+</style><main class="w">
+<div class="carte"><h2 id="etat">Connexion bancaire d'ORABUDGET</h2>
+<p id="texte">Cette page sert de retour après l'accord donné à ta banque.</p>
+<a id="lien" class="bouton" href="orabudget://banque">Revenir dans ORABUDGET</a>
+<p class="petit" id="aide" hidden>Si le bouton n'ouvre rien : touche « Copier la réponse », reviens dans ORABUDGET, puis « Coller la réponse » dans Plus › Connexion bancaire.</p>
+<button id="copier" class="second" hidden>Copier la réponse</button></div>
+<p class="petit">Cette page ne garde rien et ne contient aucun traceur : elle renvoie seulement la réponse de ta banque à l'app, sur ton téléphone.</p>
 </main>
 <script>
-// Page de retour de l'autorisation bancaire (Enable Banking) : renvoie le code reçu à l'app.
+// Page de retour de l'autorisation bancaire (Enable Banking) : renvoie la réponse reçue à l'app.
 var q = window.location.search || "";
 var lien = "orabudget://banque" + q;
 document.getElementById("lien").href = lien;
@@ -34,12 +40,16 @@ if (p.get("error")) {
   document.getElementById("etat").textContent = "La connexion n'a pas abouti";
   document.getElementById("texte").textContent = "Ta banque a répondu : " + (p.get("error_description") || p.get("error")) + ". Reviens dans ORABUDGET pour réessayer.";
 } else if (p.get("code")) {
-  document.getElementById("etat").textContent = "Compte relié";
-}
-if (q) { window.location.replace(lien); }
-else {
-  document.getElementById("etat").textContent = "Connexion bancaire d'ORABUDGET";
-  document.getElementById("texte").textContent = "Cette page sert de retour après l'accord donné à ta banque. Rien à faire ici.";
+  document.getElementById("etat").textContent = "Compte relié ✓";
+  document.getElementById("texte").textContent = "Dernière étape : touche le bouton jaune pour revenir dans ORABUDGET. Ta synchronisation démarre aussitôt.";
+  document.getElementById("aide").hidden = false;
+  var c = document.getElementById("copier");
+  c.hidden = false;
+  c.onclick = function () {
+    navigator.clipboard.writeText(lien).then(function () { c.textContent = "Réponse copiée ✓"; });
+  };
+  // Tentative automatique ; Safari peut demander « Ouvrir dans ORABUDGET ? ».
+  setTimeout(function () { window.location.href = lien; }, 400);
 }
 </script>
 </body></html>
